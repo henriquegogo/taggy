@@ -23,7 +23,7 @@
       }
       button:active, input[type=submit]:active { margin: 4px -4px -4px 4px; background: #444; box-shadow: none; }
       code { padding: 1px 4px; font-size: 0.9rem; font-weight: bold; border: 1px solid #DDD; }
-      .blue { color: #33D !important; }
+      .blue { color: #66D !important; }
       .gray { color: #555; }
       .inline-block { display: inline-block; }
       .example { margin: 10px 0; padding: 25px; color: #FFF; background: #333 }
@@ -86,15 +86,15 @@ document.body.append(t`
       
       <div class="first example"></div>
       <script type="module">
-import t from './taggy.js';
+        import t from './taggy.js';
 
-document.querySelector(".first.example").append(t`
-  <ul>
-    ${["First", "Second", "Third"].map(item => 
-      t`<li>${item}</li>`
-    )}
-  </ul>
-`);
+        document.querySelector(".first.example").append(t`
+          <ul>
+            ${["First", "Second", "Third"].map(item => 
+              t`<li>${item}</li>`
+            )}
+          </ul>
+        `);
       </script>
 
       <h3>Functional components</h3>
@@ -112,7 +112,7 @@ function Button(label, onclick) {
 
 document.body.append(t`
   &lt;div>
-    &lt;b>Click on this button and dispatch a message&lt;/b>
+    &lt;p>Click on this button and dispatch a message&lt;/p>
     ${Button("Click here", () => alert('Hello World!'))}
   &lt/div>
 `);
@@ -120,22 +120,23 @@ document.body.append(t`
       
       <div class="second example"></div>
       <script type="module">
-import t from './taggy.js';
+        import t from './taggy.js';
 
-function Button(label, onclick) {
-  return t`
-    <button ${{ onclick }}>
-      ${label}
-    </button>
-  `;
-}
+        function Button(label, onclick) {
+          return t`
+            <button ${{ onclick }}>
+              ${label}
+            </button>
+          `;
+        }
 
-document.querySelector(".second.example").append(t`
-  <div>
-    <b>Click on this button and dispatch a message</b><br /><br />
-    ${Button("Click here", () => alert('Hello World!'))}
-  </div>
-`);      </script>
+        document.querySelector(".second.example").append(t`
+          <div>
+            <p>Click on this button and dispatch a message</p>
+            ${Button("Click here", () => alert('Hello World!'))}
+          </div>
+        `);
+      </script>
 
       <h2>Download</h2>
       <a href="https://github.com/henriquegogo/taggy">GitHub Repository</a>
