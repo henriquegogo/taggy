@@ -19,7 +19,7 @@ const buttonString = `
   Click here
 </button>`;
 
-// <button onclick\=() => alert('Hello World!')\>Click here</button\>
+// <button onclick=() => alert('Hello World!')>Click here</button>
 ```
 
 This "onclick" will not work, and even if you set as string, the function only can call global functions.
