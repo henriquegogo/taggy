@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>taggy.js - Tagged Template Literals Engine</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Code+Latin:wght@100..700&display=swap');
+      html { font-family: "M PLUS Code Latin", sans-serif; font-size: 1.2rem; color: #CCC; background: #222; }
+      body { margin: 0 auto; }
+      header { padding: 40px 10px; background:#2e2e2e; border-bottom: 2px solid #444; }
+      header h1, header h3 { margin: 0; }
+      header h1 { font-size: 3rem; text-align: center; }
+      header h3 { text-align: center; }
+      main { margin: 0 auto; padding: 30px 10px; max-width: 700px; }
+      footer { padding: 10px 10px; font-size: 0.8rem; text-align: center; background:#2e2e2e; border-top: 2px solid #444; }
+      h1, h2, h3, h4, h5, h6 { font-weight: 500; color: #FFF; }
+      h2, h3 { margin-top: 50px; }
+      a { color: #CCC; }
+      button, input[type=submit] {
+        padding: 10px 20px; font-family: inherit; font-size: 1.0rem; color: #CCC;
+        cursor: pointer; background: #444; border: none; box-shadow: 4px 4px 0 #666;
+      }
+      button:active, input[type=submit]:active { margin: 4px -4px -4px 4px; background: #444; box-shadow: none; }
+      code { padding: 1px 4px; font-size: 0.9rem; font-weight: bold; border: 1px solid #DDD; }
+      .blue { color: #33D !important; }
+      .gray { color: #555; }
+      .inline-block { display: inline-block; }
+      .example { margin: 10px 0; padding: 25px; color: #FFF; background: #333 }
+    </style>
+    <script src="https://gogs.com.br/chili/chili.js" defer onload="chili('.highlight')"></script>
+  </head>
+  <body>
+    <header>
+      <h1><span class="blue">taggy</span><span class="gray">.js</span></h1>
+      <h3>Tagged Template Literals Engine</h3>
+    </header>
+    <main>
+      <h2>What is it?</h2>
+      <p>Use Template Literals with JavaScript event binding.</p>
+
+      <h2>Usage</h2>
+      <p>Usually if you create an usual Template Literal and add some JavaScript reference, that code will be written as a string.</p>
+
+<pre class="highlight">
+const buttonString = `
+&ltbutton onclick=${() => alert('Hello World!')}>
+  Click here
+&lt/button>`;
+
+// &lt;button onclick=() => alert('Hello World!')>Click here&lt;/button>
+</pre>
+
+      <p>This "onclick" will not work, and even if you set as string, the function only can call global functions.</p>
+
+      <p>With this framework, your JavaScript binding are actually real JavaScript bindings.</p>
+
+<pre class="highlight">
+import t from './taggy.js';
+
+const buttonElement = t`
+&ltbutton ${{ onclick: () => alert('Hello World!') }}>
+  Click here
+&lt/button>`;
+
+// &lt;button>Click here&lt;/button>
+</pre>
+
+      <p>The result an HTMLElement instance with "onclick" event binded. You can append to <code>document.body</code> or any other container.</p>
+
+      <h2>Examples</h2>
+
+      <h3>Array lists</h3>
+
+<pre class="highlight">
+import t from './taggy.js';
+
+document.body.append(t`
+  &lt;ul>
+    ${["First", "Second", "Third"].map(item => 
+      t`&lt;li>${item}&lt;/li>`
+    )}
+  &lt/ul>
+`);
+</pre>
+      
+      <div class="first example"></div>
+      <script type="module">
+import t from './taggy.js';
+
+document.querySelector(".first.example").append(t`
+  <ul>
+    ${["First", "Second", "Third"].map(item => 
+      t`<li>${item}</li>`
+    )}
+  </ul>
+`);
+      </script>
+
+      <h3>Functional components</h3>
+
+<pre class="highlight">
+import t from './taggy.js';
+
+function Button(label, onclick) {
+  return t`
+    &lt;button ${{ onclick }}>
+      ${label}
+    &lt/button>
+  `;
+}
+
+document.body.append(t`
+  &lt;div>
+    &lt;b>Click on this button and dispatch a message&lt;/b>
+    ${Button("Click here", () => alert('Hello World!'))}
+  &lt/div>
+`);
+</pre>
+      
+      <div class="second example"></div>
+      <script type="module">
+import t from './taggy.js';
+
+function Button(label, onclick) {
+  return t`
+    <button ${{ onclick }}>
+      ${label}
+    </button>
+  `;
+}
+
+document.querySelector(".second.example").append(t`
+  <div>
+    <b>Click on this button and dispatch a message</b><br /><br />
+    ${Button("Click here", () => alert('Hello World!'))}
+  </div>
+`);      </script>
+
+      <h2>Download</h2>
+      <a href="https://github.com/henriquegogo/taggy">GitHub Repository</a>
+
+      <h2>License</h2>
+      <p>MIT</p>
+
+    </main>
+    <footer>
+      Made for fun by <a href="https://gogs.com.br" target="_blank">Henrique Gogó</a>
+    </footer>
+  </body>
+</html>
