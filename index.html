@@ -137,6 +137,90 @@ document.body.append(t`
           </div>
         `);
       </script>
+      
+      <h3>Update itself</h3>
+
+<pre class="highlight">
+import t from './taggy.js';
+
+function Component(counter = 0) {
+
+  const increase = () => {
+    el.replaceWith(Component(counter + 1));
+  };
+
+  const el = t`
+    &lt;button ${{ onclick: increase }}>
+      Count with me - ${counter}
+    &lt;/button>`;
+
+  return el;
+}
+
+document.body.append(Component());
+</pre>
+
+      <div class="third example"></div>
+      <script type="module">
+        import t from './taggy.js';
+
+        function Component(counter = 0) {
+
+          const increase = () => {
+            el.replaceWith(Component(counter + 1));
+          };
+
+          const el = t`
+            <button ${{ onclick: increase }}>
+              Count with me -> ${counter}
+            </button>`;
+
+          return el;
+        }
+
+        document.querySelector(".third.example").append(Component());
+      </script>
+
+      <p>A little helper:</p>
+
+<pre class="highlight">
+import t from './taggy.js';
+
+const initUpdater = (fn, self) => (...props) => {
+  self.replaceWith(fn(...props)
+};
+
+function Component(text = "Click and test") {
+  const self = t`&lt;p ${{
+    onclick: () => update('Clicked')
+  }}>${text}&lt;/p>`;
+
+  const update = initUpdater(Component, self);
+
+  return self;
+}
+
+document.body.append(Component());
+</pre>
+
+      <div class="fourth example"></div>
+      <script type="module">
+        import t from './taggy.js';
+
+        const initUpdater = (fn, self) => (...props) => {
+          self.replaceWith(fn(...props));
+        };
+
+        function Component(text = "Click and test") {
+          const self = t`<p ${{
+            onclick: () => update('Clicked')
+          }}>${text}</p>`;
+          const update = initUpdater(Component, self);
+          return self;
+        }
+
+        document.querySelector(".fourth.example").append(Component());
+      </script>
 
       <h2>Download</h2>
       <a href="https://github.com/henriquegogo/taggy">GitHub Repository</a>
