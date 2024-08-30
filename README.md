@@ -81,6 +81,48 @@ document.body.append(t`
 `);
 ```
 
+### Update itself
+
+```javascript
+import t from './taggy.js';
+
+function Component(counter = 0) {
+
+  const increase = () => {
+    el.replaceWith(Component(counter + 1));
+  };
+
+  const el = t`
+    <button ${{ onclick: increase }}>
+      Count with me - ${counter}
+    </button>`;
+
+  return el;
+}
+
+document.body.append(Component());
+```
+
+### A little helper
+
+```javascript
+import t from './taggy.js';
+
+const initUpdater = (fn, self) => (...props) => {
+  self.replaceWith(fn(...props));
+};
+
+function Component(text = "Click and test") {
+  const self = t`<p ${{
+    onclick: () => update('Clicked')
+  }}>${text}</p>`;
+  const update = initUpdater(Component, self);
+  return self;
+}
+
+document.body.append(Component());
+```
+
 License
 -------
 
