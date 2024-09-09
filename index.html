@@ -222,37 +222,6 @@ document.body.append(Component());
         document.querySelector(".fourth.example").append(Component());
       </script>
 
-      <script type="module">
-        import t from './taggy.js';
-
-        const Component = function fn(text = 'No') {
-
-          const handlePClick = () => {
-            update(fn('Clicked'));
-          };
-
-          const { self, update, listen, dispatch } = t`
-            <div>
-              <p ${{ onclick: handlePClick }}>
-                ${text}
-              </p>
-              <button ${{ onclick: () => dispatch('pum', 'Nada') }}>Dispatch</button>
-            </div>
-          `;
-
-          listen('pum', msg => {
-            console.log('new');
-            update(fn('Dispatched ' + msg));
-          });
-
-          return self;
-        };
-
-        document.body.prepend(Component("Nada"));
-        document.body.prepend(Component());
-        document.body.prepend(t``);
-      </script>
-
       <h2>Download</h2>
       <a href="https://github.com/henriquegogo/taggy">GitHub Repository</a>
 
