@@ -40,186 +40,86 @@
       <p>Use Template Literals with JavaScript event binding.</p>
 
       <h2>Usage</h2>
-      <p>Usually if you create an usual Template Literal and add some JavaScript reference, that code will be written as a string.</p>
+      <p>Usually Template Literals doesn't bind any event, but only render a string.</p>
 
 <pre class="highlight">
 const buttonString = `
-&ltbutton onclick=${() => alert('Hello World!')}>
-  Click here
-&lt/button>`;
+  &ltbutton onclick="${() => alert('Hello World!')}">
+    Click here
+  &lt/button>`;
 
-// &lt;button onclick=() => alert('Hello World!')>Click here&lt;/button>
+// &lt;button onclick="() => alert('Hello World!')">Click here&lt;/button>
 </pre>
 
-      <p>This "onclick" will not work, and even if you set as string, the function only can call global functions.</p>
-
-      <p>With this framework, your JavaScript binding are actually real JavaScript bindings.</p>
-
-<pre class="highlight">
-import t from './taggy.js';
-
-const buttonElement = t`
-&ltbutton ${{ onclick: () => alert('Hello World!') }}>
-  Click here
-&lt/button>`;
-
-// &lt;button>Click here&lt;/button>
-</pre>
-
-      <p>The result an HTMLElement instance with "onclick" event binded. You can append to <code>document.body</code> or any other container.</p>
-
-      <h2>Examples</h2>
-
-      <h3>Array lists</h3>
-
-<pre class="highlight">
-import t from './taggy.js';
-
-document.body.append(t`
-  &lt;ul>
-    ${["First", "Second", "Third"].map(item => 
-      t`&lt;li>${item}&lt;/li>`
-    )}
-  &lt/ul>
-`);
-</pre>
+      <p>With this framework, your JavaScript binding are actually real JavaScript bindings and any function that returns an Element will preserve its references.</p>
       
-      <div class="first example"></div>
-      <script type="module">
-        import t from './taggy.js';
-
-        document.querySelector(".first.example").append(t`
-          <ul>
-            ${["First", "Second", "Third"].map(item => 
-              t`<li>${item}</li>`
-            )}
-          </ul>
-        `);
-      </script>
-
-      <h3>Functional components</h3>
+      <h2>Full example</h2>
 
 <pre class="highlight">
-import t from './taggy.js';
+&lt;script type="module">
+  import t from './taggy.js';
 
-function Button(label, onclick) {
-  return t`
-    &lt;button ${{ onclick }}>
+  const Button = (props, label) => t`
+    &lt;button ${props}>
       ${label}
-    &lt/button>
-  `;
-}
-
-document.body.append(t`
-  &lt;div>
-    &lt;p>Click on this button and dispatch a message&lt;/p>
-    ${Button("Click here", () => alert('Hello World!'))}
-  &lt/div>
-`);
-</pre>
-      
-      <div class="second example"></div>
-      <script type="module">
-        import t from './taggy.js';
-
-        function Button(label, onclick) {
-          return t`
-            <button ${{ onclick }}>
-              ${label}
-            </button>
-          `;
-        }
-
-        document.querySelector(".second.example").append(t`
-          <div>
-            <p>Click on this button and dispatch a message</p>
-            ${Button("Click here", () => alert('Hello World!'))}
-          </div>
-        `);
-      </script>
-      
-      <h3>Update itself</h3>
-
-<pre class="highlight">
-import t from './taggy.js';
-
-function Component(counter = 0) {
-
-  const increase = () => {
-    el.replaceWith(Component(counter + 1));
-  };
-
-  const el = t`
-    &lt;button ${{ onclick: increase }}>
-      Count with me - ${counter}
     &lt;/button>`;
 
-  return el;
-}
+  const MyComponent = (list = ["First", "Second"]) => {
 
-document.body.append(Component());
+    const {self, update, listen, dispatch} = t`
+      &lt;div>
+        &lt;ul>
+          ${list.map(item => t`&lt;li>${item}&lt;/li>`)}
+        &lt;/ul>
+
+        ${Button({ onclick: () => 
+          dispatch("updateList", ["Updated item"])
+        }, "Click me")}
+
+      &lt;/div>`;
+
+    listen("updateList", props => {
+      update(MyComponent(props))
+    });
+
+    return self;
+  }
+
+  document.querySelector(".example").append(MyComponent());
+&lt;/script>
 </pre>
 
-      <div class="third example"></div>
+      <div class="example"></div>
       <script type="module">
         import t from './taggy.js';
 
-        function Component(counter = 0) {
+        const Button = (props, label) => t`
+          <button ${props}>
+            ${label}
+          </button>`;
 
-          const increase = () => {
-            el.replaceWith(Component(counter + 1));
-          };
+        const MyComponent = (list = ["First", "Second"]) => {
 
-          const el = t`
-            <button ${{ onclick: increase }}>
-              Count with me -> ${counter}
-            </button>`;
+          const {self, update, listen, dispatch} = t`
+            <div>
+              <ul>
+                ${list.map(item => t`<li>${item}</li>`)}
+              </ul>
 
-          return el;
-        }
+              ${Button({ onclick: () => 
+                dispatch("updateList", ["Updated item"])
+              }, "Click me")}
 
-        document.querySelector(".third.example").append(Component());
-      </script>
+            </div>`;
 
-      <p>A little helper:</p>
+          listen("updateList", props => {
+            update(MyComponent(props))
+          });
 
-<pre class="highlight">
-import t from './taggy.js';
-
-const initUpdater = (fn, self) => (...props) => {
-  self.replaceWith(fn(...props)
-};
-
-function Component(text = "Click and test") {
-  const self = t`&lt;p ${{
-    onclick: () => update('Clicked')
-  }}>${text}&lt;/p>`;
-
-  const update = initUpdater(Component, self);
-
-  return self;
-}
-
-document.body.append(Component());
-</pre>
-
-      <div class="fourth example"></div>
-      <script type="module">
-        import t from './taggy.js';
-
-        const initUpdater = (fn, self) => (...props) => {
-          self.replaceWith(fn(...props));
-        };
-
-        function Component(text = "Click and test") {
-          const self = t`<p ${{
-            onclick: () => update('Clicked')
-          }}>${text}</p>`;
-          const update = initUpdater(Component, self);
           return self;
         }
 
-        document.querySelector(".fourth.example").append(Component());
+        document.querySelector(".example").append(MyComponent());
       </script>
 
       <h2>Download</h2>
