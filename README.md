@@ -88,7 +88,7 @@ import t from './taggy.js';
 
 function Component() {
 
-  const { self, listen, dispatch } = t`${Component}
+  const { listen, dispatch } = self = t`${Component}
     <button ${{ onclick: () => dispatch("alert") }}>
       Don't click!
     </button>`;
@@ -108,7 +108,7 @@ import t from './taggy.js';
 
 function Component(counter = 0) {
 
-  const { self, update } = t`${Component}
+  const { update } = self = t`${Component}
     <button ${{ onclick: () => update(counter + 1) }}>
       Count with me - ${counter}
     </button>`;
