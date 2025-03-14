@@ -81,6 +81,26 @@ document.body.append(t`
 `);
 ```
 
+### Event listener
+
+```javascript
+import t from './taggy.js';
+
+function Component() {
+
+  const { self, listen, dispatch } = t`${Component}
+    <button ${{ onclick: () => dispatch("alert") }}>
+      Don't click!
+    </button>`;
+
+  listen("alert", () => alert("Ouch!"));
+
+  return self;
+}
+
+document.body.append(Component());
+```
+
 ### Update itself
 
 ```javascript
@@ -88,35 +108,11 @@ import t from './taggy.js';
 
 function Component(counter = 0) {
 
-  const increase = () => {
-    el.replaceWith(Component(counter + 1));
-  };
-
-  const el = t`
-    <button ${{ onclick: increase }}>
+  const { self, update } = t`${Component}
+    <button ${{ onclick: () => update(counter + 1) }}>
       Count with me - ${counter}
     </button>`;
 
-  return el;
-}
-
-document.body.append(Component());
-```
-
-### A little helper
-
-```javascript
-import t from './taggy.js';
-
-const initUpdater = (fn, self) => (...props) => {
-  self.replaceWith(fn(...props));
-};
-
-function Component(text = "Click and test") {
-  const self = t`<p ${{
-    onclick: () => update('Clicked')
-  }}>${text}</p>`;
-  const update = initUpdater(Component, self);
   return self;
 }
 

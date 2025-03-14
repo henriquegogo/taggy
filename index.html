@@ -52,40 +52,42 @@ const buttonString = `
 </pre>
 
       <p>With this framework, your JavaScript binding are actually real JavaScript bindings and any function that returns an Element will preserve its references.</p>
-      
+
       <h2>Full example</h2>
 
 <pre class="highlight">
+&lt;div class="example">&lt;/div>
 &lt;script type="module">
   import t from './taggy.js';
 
-  const Button = (props, label) => t`
-    &lt;button ${props}>
+  const Button = (label, onclick) => t`
+    &lt;button ${{onclick}}>
       ${label}
     &lt;/button>`;
 
-  const MyComponent = (list = ["First", "Second"]) => {
-
+  const MyComponent = (props) => {
     const {self, update, listen, dispatch} = t`
+      ${MyComponent}
       &lt;div>
         &lt;ul>
-          ${list.map(item => t`&lt;li>${item}&lt;/li>`)}
+          ${props.map(item => t`&lt;li>${item}&lt;/li>`)}
         &lt;/ul>
 
-        ${Button({ onclick: () => 
-          dispatch("updateList", ["Updated item"])
-        }, "Click me")}
+        ${Button("Update by event", () =>
+          dispatch("updateList", ["Event updated"]))}
+
+        ${Button("Update by function", () =>
+          update([...props, "Function updated"]))}
 
       &lt;/div>`;
 
-    listen("updateList", props => {
-      update(MyComponent(props))
-    });
+    listen("updateList", update);
 
     return self;
   }
 
-  document.querySelector(".example").append(MyComponent());
+  document.querySelector(".example").append(
+    MyComponent(["First", "Second"]));
 &lt;/script>
 </pre>
 
@@ -93,33 +95,33 @@ const buttonString = `
       <script type="module">
         import t from './taggy.js';
 
-        const Button = (props, label) => t`
-          <button ${props}>
+        const Button = (label, onclick) => t`
+          <button ${{onclick}}>
             ${label}
           </button>`;
 
-        const MyComponent = (list = ["First", "Second"]) => {
-
+        const MyComponent = (props) => {
           const {self, update, listen, dispatch} = t`
+            ${MyComponent}
             <div>
               <ul>
-                ${list.map(item => t`<li>${item}</li>`)}
+                ${props.map(item => t`<li>${item}</li>`)}
               </ul>
 
-              ${Button({ onclick: () => 
-                dispatch("updateList", ["Updated item"])
-              }, "Click me")}
+              ${Button("Update by event", () =>
+                dispatch("updateList", ["Event updated"]))}
+
+              ${Button("Update by function", () =>
+                update([...props, "Function updated"]))}
 
             </div>`;
 
-          listen("updateList", props => {
-            update(MyComponent(props))
-          });
+          listen("updateList", update);
 
           return self;
         }
 
-        document.querySelector(".example").append(MyComponent());
+        document.querySelector(".example").append(MyComponent(["First", "Second"]));
       </script>
 
       <h2>Download</h2>

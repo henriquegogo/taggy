@@ -3,7 +3,8 @@ export default function(strs, ...vals) {
 
   // Set slots to be replaced by instance references.
   wrapper.innerHTML = strs.map((str, i) => str + (
-    vals[i]?.constructor === Object ? `data-i="${i}"`
+    vals[i]?.constructor === Function ? (vals.fn = vals[i], "")
+    : vals[i]?.constructor === Object ? `data-i="${i}"`
     : Array.isArray(vals[i]) || vals[i] instanceof Node
     ? `<slot data-i="${i}"></slot>` : vals[i] ?? "")).join("");
 
@@ -17,7 +18,8 @@ export default function(strs, ...vals) {
 
   // Create essential functions to handle events and state.
   el.self = el;
-  el.update = (newEl) => el.replaceWith(newEl);
+  el.fn = vals.fn;
+  el.update = (props) => el.replaceWith(el.fn(props));
   el.listen = (ev, fn) => (el.dataset.event = "", el)
     .addEventListener(ev, ({detail}) => fn(detail));
   el.dispatch = (ev, detail) => document.querySelectorAll("[data-event]")
