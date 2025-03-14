@@ -15,7 +15,7 @@ export default function(strs, ...vals) {
     : Object.assign(el, vals[el.dataset.i], delete el.dataset.i));
 
   // Create essential functions to handle events and state.
-  const el = wrapper.children[0] || wrapper;
+  const el = wrapper.children.length == 1 ? wrapper.children[0] : wrapper;
   el.update = (props) => el.replaceWith(vals.fn(props));
   el.listen = (ev, fn) => (el.dataset.event = "", el)
     .addEventListener(ev, ({detail}) => fn(detail));

@@ -68,18 +68,15 @@ const buttonString = `
   const MyComponent = (props) => {
     const {update, listen, dispatch} = self = t`
       ${MyComponent}
-      &lt;div>
-        &lt;ul>
-          ${props.map(item => t`&lt;li>${item}&lt;/li>`)}
-        &lt;/ul>
+      &lt;ul>
+        ${props.map(item => t`&lt;li>${item}&lt;/li>`)}
+      &lt;/ul>
 
-        ${Button("Update by event", () =>
-          dispatch("updateList", ["Event updated"]))}
+      ${Button("Update by event", () =>
+        dispatch("updateList", ["Event updated"]))}
 
-        ${Button("Update by function", () =>
-          update([...props, "Function updated"]))}
-
-      &lt;/div>`;
+      ${Button("Update by function", () =>
+        update([...props, "Function updated"]))}`;
 
     listen("updateList", update);
 
@@ -103,18 +100,15 @@ const buttonString = `
         const MyComponent = (props) => {
           const {update, listen, dispatch} = self = t`
             ${MyComponent}
-            <div>
-              <ul>
-                ${props.map(item => t`<li>${item}</li>`)}
-              </ul>
+            <ul>
+              ${props.map(item => t`<li>${item}</li>`)}
+            </ul>
 
-              ${Button("Update by event", () =>
-                dispatch("updateList", ["Event updated"]))}
+            ${Button("Update by event", () =>
+              dispatch("updateList", ["Event updated"]))}
 
-              ${Button("Update by function", () =>
-                update([...props, "Function updated"]))}
-
-            </div>`;
+            ${Button("Update by function", () =>
+              update([...props, "Function updated"]))} `;
 
           listen("updateList", update);
 
