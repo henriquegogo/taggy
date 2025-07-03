@@ -15,9 +15,10 @@ Usually if you create an usual Template Literal and add some JavaScript referenc
 
 ```javascript
 const buttonString = `
-<button onclick=${() => alert('Hello World!')}>
-  Click here
-</button>`;
+  <button onclick=${() => alert('Hello World!')}>
+    Click here
+  </button>
+`;
 
 // <button onclick=() => alert('Hello World!')>Click here</button>
 ```
@@ -30,9 +31,10 @@ With this framework, your JavaScript binding are actually real JavaScript bindin
 import html from './taggy.js';
 
 const buttonElement = html`
-<button ${{ onclick: () => alert('Hello World!') }}>
-  Click here
-</button>`;
+  <button ${{ onclick: () => alert('Hello World!') }}>
+    Click here
+  </button>
+`;
 
 // <button>Click here</button>
 ```
@@ -78,13 +80,11 @@ document.body.append(html`
 ```javascript
 import html from './taggy.js';
 
-function Button(label, onclick) {
-  return html`
-    <button ${{ onclick }}>
-      ${label}
-    </button>
-  `;
-}
+const Button = (label, onclick) => html`
+  <button ${{ onclick }}>
+    ${label}
+  </button>
+`;
 
 document.body.append(html`
   <div>

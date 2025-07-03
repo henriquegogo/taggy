@@ -28,7 +28,7 @@
       .inline-block { display: inline-block; }
       .example { margin: 10px 0; padding: 25px; color: #FFF; background: #333 }
     </style>
-    <script src="https://gogs.com.br/chili/chili.js" defer onload="chili('.highlight')"></script>
+    <script src="https://gogs.com.br/chili/chili.js" defer onload="chili('pre')"></script>
   </head>
   <body>
     <header>
@@ -36,22 +36,107 @@
       <h3>Tagged Template Literals Engine</h3>
     </header>
     <main>
-      <h2>What is it?</h2>
-      <p>Use Template Literals with JavaScript event binding.</p>
-
-      <h2>Usage</h2>
-      <p>Usually Template Literals doesn't bind any event, but only render a string.</p>
-
-<pre class="highlight">
-const buttonString = `
-  &ltbutton onclick="${() => alert('Hello World!')}">
+<h2 id="what-is-it">What is it?</h2>
+<p>Use Template Literals with JavaScript event binding.</p>
+<h2 id="usage">Usage</h2>
+<p>Usually if you create an usual Template Literal and add some
+JavaScript reference, that code will be written as a string.</p>
+<pre>const buttonString = `
+  &lt;button onclick=${() =&gt; alert(&#39;Hello World!&#39;)}&gt;
     Click here
-  &lt/button>`;
+  &lt;/button&gt;
+`;
 
-// &lt;button onclick="() => alert('Hello World!')">Click here&lt;/button>
-</pre>
+// &lt;button onclick=() =&gt; alert(&#39;Hello World!&#39;)&gt;Click here&lt;/button&gt;</pre>
+<p>This “onclick” will not work, and even if you set as string, the
+function only can call global functions.</p>
+<p>With this framework, your JavaScript binding are actually real
+JavaScript bindings.</p>
+<pre>import html from &#39;./taggy.js&#39;;
 
-      <p>With this framework, your JavaScript binding are actually real JavaScript bindings and any function that returns an Element will preserve its references.</p>
+const buttonElement = html`
+  &lt;button ${{ onclick: () =&gt; alert(&#39;Hello World!&#39;) }}&gt;
+    Click here
+  &lt;/button&gt;
+`;
+
+// &lt;button&gt;Click here&lt;/button&gt;</pre>
+<p>The result an HTMLElement instance with “onclick” event binded. You
+can append to document.body or any other container.</p>
+<p>As alternative, you can use functions builders instead of template
+literals.</p>
+<pre>import { ElementBuilder } from &#39;./taggy.js&#39;;
+const { button } = ElementBuilder;
+
+const buttonElement = button({
+  onclick: () =&gt; alert(&#39;Hello World!&#39;)
+}, &quot;Click here&quot;);
+
+// &lt;button&gt;Click here&lt;/button&gt;</pre>
+<h2 id="examples">Examples</h2>
+<h3 id="array-lists">Array lists</h3>
+<pre>import html, { ElementBuilder } from &#39;./taggy.js&#39;;
+const { li } = ElementBuilder;
+
+document.body.append(html`
+  &lt;ul&gt;
+    ${[&quot;First&quot;, &quot;Second&quot;, &quot;Third&quot;].map(item =&gt; li(item))}
+  &lt;/ul&gt;
+`);</pre>
+<ul>
+<li>First</li>
+<li>Second</li>
+<li>Third</li>
+</ul>
+<h3 id="functional-components">Functional components</h3>
+<pre>import html from &#39;./taggy.js&#39;;
+
+const Button = (label, onclick) =&gt; html`
+  &lt;button ${{ onclick }}&gt;
+    ${label}
+  &lt;/button&gt;
+`;
+
+document.body.append(html`
+  &lt;div&gt;
+    &lt;b&gt;Click on this button and dispatch a message&lt;/b&gt;
+    ${Button(&quot;Click here&quot;, () =&gt; alert(&#39;Hello World!&#39;))}
+  &lt;/div&gt;
+`);</pre>
+<h3 id="event-listener">Event listener</h3>
+<pre>import html, { EventHandler } from &#39;./taggy.js&#39;;
+
+function Component() {
+  let dispatch;
+
+  const handleEvents = (el) =&gt; {
+    const { listen } = EventHandler(el, Component);
+    listen(&quot;alert&quot;, () =&gt; alert(&quot;Ouch!&quot;));
+    return el;
+  };
+
+  return { dispatch } = handleEvents(html`
+    &lt;button ${{ onclick: () =&gt; dispatch(&quot;alert&quot;) }}&gt;
+      Don&#39;t click!
+    &lt;/button&gt;
+  `);
+}
+
+document.body.append(Component());</pre>
+<h3 id="update-itself">Update itself</h3>
+<pre>import html, { EventHandler } from &#39;./taggy.js&#39;;
+
+function Component(counter = 0) {
+  let update;
+
+  return { update } = EventHandler(html`
+    &lt;button ${{ onclick: () =&gt; update(counter + 1) }}&gt;
+      Count with me - ${counter}
+    &lt;/button&gt;
+  `, Component);
+}
+
+document.body.append(Component());</pre>
 
       <h2>Full example</h2>
 
