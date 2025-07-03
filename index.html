@@ -56,66 +56,72 @@ const buttonString = `
       <h2>Full example</h2>
 
 <pre class="highlight">
-&lt;div class="example">&lt;/div>
-&lt;script type="module">
-  import t from './taggy.js';
+import html, { ElementBuilder, EventHandler } from './taggy.js';
+const { li } = ElementBuilder;
 
-  const Button = (label, onclick) => t`
-    &lt;button ${{onclick}}>
-      ${label}
-    &lt;/button>`;
+const Title = (text) => html`&lt;h2>${text}&lt;/h2>`;
 
-  const MyComponent = (props) => {
-    const {update, listen, dispatch} = self = t`
-      ${MyComponent}
-      &lt;ul>
-        ${props.map(item => t`&lt;li>${item}&lt;/li>`)}
-      &lt;/ul>
+function View(props) {
+  let update, dispatch;
 
-      ${Button("Update by event", () =>
-        dispatch("updateList", ["Event updated"]))}
-
-      ${Button("Update by function", () =>
-        update([...props, "Function updated"]))}`;
-
+  const handleEvents = (el) => {
+    const { listen, update } = EventHandler(el, View);
     listen("updateList", update);
+    return el;
+  };
 
-    return self;
-  }
+  return { update, dispatch } = handleEvents(html`
+    ${Title("Dynamic List")}
 
-  document.querySelector(".example").append(
-    MyComponent(["First", "Second"]));
-&lt;/script>
+    &lt;button ${{ onclick: () =>
+      dispatch("updateList", ["Event updated"])
+    }}>Update by event&lt;/button>
+
+    &lt;button ${{ onclick: () =>
+      update([...props, "Function updated"])
+    }}>Update by function&lt;/button>
+
+    &lt;ul>${props.map(item => li(item))}&lt;/ul>
+  `);
+}
+
+document.querySelector(".example")
+  .append(View(["First", "Second"]));
 </pre>
 
       <div class="example"></div>
       <script type="module">
-        import t from './taggy.js';
+        import html, { ElementBuilder, EventHandler } from './taggy.js';
+        const { li } = ElementBuilder;
 
-        const Button = (label, onclick) => t`
-          <button ${{onclick}}>
-            ${label}
-          </button>`;
+        const Title = (text) => html`<h2>${text}</h2>`;
 
-        const MyComponent = (props) => {
-          const {update, listen, dispatch} = self = t`
-            ${MyComponent}
-            <ul>
-              ${props.map(item => t`<li>${item}</li>`)}
-            </ul>
+        function View(props) {
+          let update, dispatch;
 
-            ${Button("Update by event", () =>
-              dispatch("updateList", ["Event updated"]))}
+          const handleEvents = (el) => {
+            const { listen, update } = EventHandler(el, View);
+            listen("updateList", update);
+            return el;
+          };
 
-            ${Button("Update by function", () =>
-              update([...props, "Function updated"]))} `;
+          return { update, dispatch } = handleEvents(html`
+            ${Title("Dynamic List")}
 
-          listen("updateList", update);
+            <button ${{ onclick: () =>
+              dispatch("updateList", ["Event updated"])
+            }}>Update by event</button>
 
-          return self;
+            <button ${{ onclick: () =>
+              update([...props, "Function updated"])
+            }}>Update by function</button>
+
+            <ul>${props.map(item => li(item))}</ul>
+          `);
         }
 
-        document.querySelector(".example").append(MyComponent(["First", "Second"]));
+        document.querySelector(".example")
+          .append(View(["First", "Second"]));
       </script>
 
       <h2>Download</h2>

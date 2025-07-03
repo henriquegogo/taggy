@@ -27,9 +27,9 @@ This "onclick" will not work, and even if you set as string, the function only c
 With this framework, your JavaScript binding are actually real JavaScript bindings.
 
 ```javascript
-import t from './taggy.js';
+import html from './taggy.js';
 
-const buttonElement = t`
+const buttonElement = html`
 <button ${{ onclick: () => alert('Hello World!') }}>
   Click here
 </button>`;
@@ -39,19 +39,32 @@ const buttonElement = t`
 
 The result an HTMLElement instance with "onclick" event binded. You can append to `document.body` or any other container.
 
+As alternative, you can use functions builders instead of template literals.
+
+```javascript
+import { ElementBuilder } from './taggy.js';
+const { button } = ElementBuilder;
+
+const buttonElement = button({
+  onclick: () => alert('Hello World!')
+}, "Click here");
+
+// <button>Click here</button>
+```
+
+
 Examples
 --------
 
 ### Array lists
 
 ```javascript
-import t from './taggy.js';
+import html, { ElementBuilder } from './taggy.js';
+const { li } = ElementBuilder;
 
-document.body.append(t`
+document.body.append(html`
   <ul>
-    ${["First", "Second", "Third"].map(item => 
-      t`<li>${item}</li>`
-    )}
+    ${["First", "Second", "Third"].map(item => li(item))}
   </ul>
 `);
 ```
@@ -63,17 +76,17 @@ document.body.append(t`
 ### Functional components
 
 ```javascript
-import t from './taggy.js';
+import html from './taggy.js';
 
 function Button(label, onclick) {
-  return t`
+  return html`
     <button ${{ onclick }}>
       ${label}
     </button>
   `;
 }
 
-document.body.append(t`
+document.body.append(html`
   <div>
     <b>Click on this button and dispatch a message</b>
     ${Button("Click here", () => alert('Hello World!'))}
@@ -84,18 +97,22 @@ document.body.append(t`
 ### Event listener
 
 ```javascript
-import t from './taggy.js';
+import html, { EventHandler } from './taggy.js';
 
 function Component() {
+  let dispatch;
 
-  const { listen, dispatch } = self = t`${Component}
+  const handleEvents = (el) => {
+    const { listen } = EventHandler(el, Component);
+    listen("alert", () => alert("Ouch!"));
+    return el;
+  };
+
+  return { dispatch } = handleEvents(html`
     <button ${{ onclick: () => dispatch("alert") }}>
       Don't click!
-    </button>`;
-
-  listen("alert", () => alert("Ouch!"));
-
-  return self;
+    </button>
+  `);
 }
 
 document.body.append(Component());
@@ -104,16 +121,16 @@ document.body.append(Component());
 ### Update itself
 
 ```javascript
-import t from './taggy.js';
+import html, { EventHandler } from './taggy.js';
 
 function Component(counter = 0) {
+  let update;
 
-  const { update } = self = t`${Component}
+  return { update } = EventHandler(html`
     <button ${{ onclick: () => update(counter + 1) }}>
       Count with me - ${counter}
-    </button>`;
-
-  return self;
+    </button>
+  `, Component);
 }
 
 document.body.append(Component());
