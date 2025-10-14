@@ -12,7 +12,7 @@
       header h1, header h3 { margin: 0; }
       header h1 { font-size: 3rem; text-align: center; }
       header h3 { text-align: center; }
-      main { margin: 0 auto; padding: 30px 10px; max-width: 700px; }
+      main { margin: 0 auto; padding: 30px 10px; max-width: 900px; }
       footer { padding: 10px 10px; font-size: 0.8rem; text-align: center; background:#2e2e2e; border-top: 2px solid #444; }
       h1, h2, h3, h4, h5, h6 { font-weight: 500; color: #FFF; }
       h2, h3 { margin-top: 50px; }
@@ -36,178 +36,63 @@
       <h3>Tagged Template Literals Engine</h3>
     </header>
     <main>
-<h2 id="what-is-it">What is it?</h2>
-<p>Use Template Literals with JavaScript event binding.</p>
-<h2 id="usage">Usage</h2>
-<p>Usually if you create an usual Template Literal and add some
-JavaScript reference, that code will be written as a string.</p>
-<pre>const buttonString = `
-  &lt;button onclick=${() =&gt; alert(&#39;Hello World!&#39;)}&gt;
-    Click here
-  &lt;/button&gt;
-`;
-
-// &lt;button onclick=() =&gt; alert(&#39;Hello World!&#39;)&gt;Click here&lt;/button&gt;</pre>
-<p>This “onclick” will not work, and even if you set as string, the
-function only can call global functions.</p>
-<p>With this framework, your JavaScript binding are actually real
-JavaScript bindings.</p>
-<pre>import html from &#39;./taggy.js&#39;;
-
-const buttonElement = html`
-  &lt;button ${{ onclick: () =&gt; alert(&#39;Hello World!&#39;) }}&gt;
-    Click here
-  &lt;/button&gt;
-`;
-
-// &lt;button&gt;Click here&lt;/button&gt;</pre>
-<p>The result an HTMLElement instance with “onclick” event binded. You
-can append to document.body or any other container.</p>
-<p>As alternative, you can use functions builders instead of template
-literals.</p>
-<pre>import { ElementBuilder } from &#39;./taggy.js&#39;;
-const { button } = ElementBuilder;
-
-const buttonElement = button({
-  onclick: () =&gt; alert(&#39;Hello World!&#39;)
-}, &quot;Click here&quot;);
-
-// &lt;button&gt;Click here&lt;/button&gt;</pre>
-<h2 id="examples">Examples</h2>
-<h3 id="array-lists">Array lists</h3>
-<pre>import html, { ElementBuilder } from &#39;./taggy.js&#39;;
-const { li } = ElementBuilder;
-
-document.body.append(html`
-  &lt;ul&gt;
-    ${[&quot;First&quot;, &quot;Second&quot;, &quot;Third&quot;].map(item =&gt; li(item))}
-  &lt;/ul&gt;
-`);</pre>
-<ul>
-<li>First</li>
-<li>Second</li>
-<li>Third</li>
-</ul>
-<h3 id="functional-components">Functional components</h3>
-<pre>import html from &#39;./taggy.js&#39;;
-
-const Button = (label, onclick) =&gt; html`
-  &lt;button ${{ onclick }}&gt;
-    ${label}
-  &lt;/button&gt;
-`;
-
-document.body.append(html`
-  &lt;div&gt;
-    &lt;b&gt;Click on this button and dispatch a message&lt;/b&gt;
-    ${Button(&quot;Click here&quot;, () =&gt; alert(&#39;Hello World!&#39;))}
-  &lt;/div&gt;
-`);</pre>
-<h3 id="event-listener">Event listener</h3>
-<pre>import html, { EventHandler } from &#39;./taggy.js&#39;;
-
-function Component() {
-  let dispatch;
-
-  const handleEvents = (el) =&gt; {
-    const { listen } = EventHandler(el, Component);
-    listen(&quot;alert&quot;, () =&gt; alert(&quot;Ouch!&quot;));
-    return el;
-  };
-
-  return { dispatch } = handleEvents(html`
-    &lt;button ${{ onclick: () =&gt; dispatch(&quot;alert&quot;) }}&gt;
-      Don&#39;t click!
-    &lt;/button&gt;
-  `);
-}
-
-document.body.append(Component());</pre>
-<h3 id="update-itself">Update itself</h3>
-<pre>import html, { EventHandler } from &#39;./taggy.js&#39;;
-
-function Component(counter = 0) {
-  let update;
-
-  return { update } = EventHandler(html`
-    &lt;button ${{ onclick: () =&gt; update(counter + 1) }}&gt;
-      Count with me - ${counter}
-    &lt;/button&gt;
-  `, Component);
-}
-
-document.body.append(Component());</pre>
-
       <h2>Full example</h2>
 
-<pre class="highlight">
-import html, { ElementBuilder, EventHandler } from './taggy.js';
-const { li } = ElementBuilder;
+      <script id="example-script" type="module">
+        import html, { defineElement } from './taggy.js';
 
-const Title = (text) => html`&lt;h2>${text}&lt;/h2>`;
-
-function View(props) {
-  let update, dispatch;
-
-  const handleEvents = (el) => {
-    const { listen, update } = EventHandler(el, View);
-    listen("updateList", update);
-    return el;
-  };
-
-  return { update, dispatch } = handleEvents(html`
-    ${Title("Dynamic List")}
-
-    &lt;button ${{ onclick: () =>
-      dispatch("updateList", ["Event updated"])
-    }}>Update by event&lt;/button>
-
-    &lt;button ${{ onclick: () =>
-      update([...props, "Function updated"])
-    }}>Update by function&lt;/button>
-
-    &lt;ul>${props.map(item => li(item))}&lt;/ul>
-  `);
-}
-
-document.querySelector(".example")
-  .append(View(["First", "Second"]));
-</pre>
-
-      <div class="example"></div>
-      <script type="module">
-        import html, { ElementBuilder, EventHandler } from './taggy.js';
-        const { li } = ElementBuilder;
-
-        const Title = (text) => html`<h2>${text}</h2>`;
-
-        function View(props) {
-          let update, dispatch;
-
-          const handleEvents = (el) => {
-            const { listen, update } = EventHandler(el, View);
-            listen("updateList", update);
-            return el;
+        function AButton({ children: label, dispatch, update, count = 0 }) {
+          const handleClick = () => {
+            update({ count: count + 1 });
+            dispatch("clickalert");
           };
-
-          return { update, dispatch } = handleEvents(html`
-            ${Title("Dynamic List")}
-
-            <button ${{ onclick: () =>
-              dispatch("updateList", ["Event updated"])
-            }}>Update by event</button>
-
-            <button ${{ onclick: () =>
-              update([...props, "Function updated"])
-            }}>Update by function</button>
-
-            <ul>${props.map(item => li(item))}</ul>
-          `);
+        
+          return html`
+            <button ${{ onclick: handleClick }}>${label} ${count}</button>
+          `;
         }
+        defineElement(AButton);
 
-        document.querySelector(".example")
-          .append(View(["First", "Second"]));
+        function UList({ loaded, update, items }) {
+          
+          if (!loaded) {
+            // Manual component lifecycle control using "loaded" flag
+            fetch("/").then(res => res.text()).then(res => {
+              update({ loaded: true, items: ["OK", ...items] })
+            });
+          }
+
+          return html`
+            <ul>
+              ${items.map(item => html`
+                <li>${item}</li>
+              `)}
+            </ul>
+          `;
+        }
+        defineElement(UList);
+        
+        defineElement(({ children, listen }) => {
+          listen("clickalert", () => console.log("Button clicked")); 
+
+          return html`
+            <u-list ${{ items: ["First", "Second", "Third"] }}></u-list>
+            <a-button>Click</a-button>
+            <div>${children}</div>
+          `;
+        }, "the-content");
       </script>
+
+      <pre id="example-viewer"></pre>
+      <script>
+        document.querySelector("#example-viewer").textContent =
+          document.querySelector("#example-script").textContent
+          .replace(/\n {8}/g, "\n");
+      </script>
+
+      <the-content>
+        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+      </the-content>
 
       <h2>Download</h2>
       <a href="https://github.com/henriquegogo/taggy">GitHub Repository</a>
